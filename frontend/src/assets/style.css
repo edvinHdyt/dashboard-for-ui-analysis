@@ -6,3 +6,12 @@
     --font-display: 'Roboto', sans-serif;
     --color-primary: #0C3E45;
 }
+
+@keyframes shrinkWidth {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}

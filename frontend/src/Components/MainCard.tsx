@@ -8,4 +8,12 @@ const LoginCard = ({children}: {children: ReactNode}) => {
     )
 }
 
-export {LoginCard};
+const MainCard = ({children}: {children: ReactNode}) => {
+    return (
+        <div className="w-full min-h-20 bg-white border border-slate-300 shadow-md rounded-md px-5 py-2">
+            {children}
+        </div>
+    )
+}
+
+export {LoginCard, MainCard};

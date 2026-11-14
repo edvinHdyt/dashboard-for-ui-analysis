@@ -1,11 +1,13 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import "./assets/style.css"
-import { createBrowserRouter, RouterProvider } from 'react-router'
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router'
 import LoginLayout from './Layouts/LoginLayout'
 import Login from './pages/auth/Login'
 import MainLayout from "./Layouts/MainLayout"
 import Dashboard from "./pages/admin/Dashboard"
+import Authors from './pages/admin/Authors'
+import AuthorCreate from './pages/admin/AuthorCreate'
 
 const router = createBrowserRouter([
   {
@@ -14,11 +16,19 @@ const router = createBrowserRouter([
    children: [
     {
       index: true,
-      element: <Dashboard />
+      element: <Navigate to="dashboard" replace />
     },
     {
       path: "dashboard",
       element: <Dashboard/>
+    },
+    {
+      path: "authors",
+      element: <Authors />
+    },
+    {
+      path:'authors/create',
+      element: <AuthorCreate/>,
     }
    ]
   },

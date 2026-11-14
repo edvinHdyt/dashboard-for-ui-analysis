@@ -8,7 +8,9 @@ export interface sidebarAdminProps{
 
 export const SidebarComponnent = ({isSidebarOpen, setIsSidebarOpen}: sidebarAdminProps) => {
     const iconWidth="1.4em";
-    
+    const classMenuActive = 'w-full hover:bg-white/30 px-3 py-2 flex gap-2 rounded-md bg-white/30';
+    const classMenuInActive = 'w-full hover:bg-white/30 px-3 py-2 flex gap-2 rounded-md';
+
     return (
         <div className="flex flex-col px-6 py-5 w-70 min-h-screen justify-start items-center gap-4 relative">
             {/* close button */}
@@ -24,9 +26,9 @@ export const SidebarComponnent = ({isSidebarOpen, setIsSidebarOpen}: sidebarAdmi
                     Swakarsa
                 </h1>
             </a>
-
+``
             <ul className="flex flex-col gap-3 text-white w-full items-center">
-               <NavLink className="w-full bg-white/30 px-3 py-2 flex gap-2 rounded-md" to={""}>
+               <NavLink className={( {isActive} ) => isActive ? classMenuActive: classMenuInActive} to={"dashboard"}>
                     <svg xmlns="http://www.w3.org/2000/svg" width={`${iconWidth}`} height={`${iconWidth}`} viewBox="0 0 24 24">
                         <path d="M0 0h24v24H0z" fill="none" />
                         <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
@@ -36,7 +38,7 @@ export const SidebarComponnent = ({isSidebarOpen, setIsSidebarOpen}: sidebarAdmi
                     </svg>
                     <span>Dashboard</span>
                </NavLink>
-               <NavLink className="w-full  px-3 py-2 flex gap-2 rounded-md hover:bg-white/30" to={""}>
+               <NavLink className={({isActive}) => isActive ? classMenuActive : classMenuInActive} to={"authors"}>
                    <svg xmlns="http://www.w3.org/2000/svg" width={`${iconWidth}`} height={`${iconWidth}`} viewBox="0 0 24 24">
                         <path d="M0 0h24v24H0z" fill="none" />
                         <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">
@@ -47,7 +49,7 @@ export const SidebarComponnent = ({isSidebarOpen, setIsSidebarOpen}: sidebarAdmi
 
                     <span>Authors</span>
                </NavLink>
-               <NavLink className="w-full  px-3 py-2 flex gap-2 rounded-md hover:bg-white/30" to={""}>
+               <NavLink className={({isActive}) => isActive ? classMenuActive : classMenuInActive} to={"books"}>
                    <svg xmlns="http://www.w3.org/2000/svg" width={`${iconWidth}`} height={`${iconWidth}`} viewBox="0 0 24 24">
                         <path d="M0 0h24v24H0z" fill="none" />
                         <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 6s1.5-2 5-2s5 2 5 2v14s-1.5-1-5-1s-5 1-5 1zm10 0s1.5-2 5-2s5 2 5 2v14s-1.5-1-5-1s-5 1-5 1z" />
