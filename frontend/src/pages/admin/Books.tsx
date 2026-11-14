@@ -5,7 +5,6 @@ import { ButtonAdd, ButtonDeleteBulk } from "../../Components/Button";
 import { useOutletContext } from "react-router";
 import { useEffect } from "react";
 import type { MainLayoutContext } from "../../Layouts/MainLayout";
-import Select from "react-select/base";
 
 const bookStatus = {
     Tersedia: "Tersedia",

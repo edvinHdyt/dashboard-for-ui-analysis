@@ -12,6 +12,8 @@ import Books from './pages/admin/Books'
 import BookCreate from './pages/admin/BookCreate'
 import Category from './pages/admin/Category'
 import CategoryCreate from './pages/admin/CategoryCreate'
+import UserManagement from './pages/admin/UserManagement'
+import UserManagementCreate from './pages/admin/UserManagementCreate'
 
 const router = createBrowserRouter([
   {
@@ -49,6 +51,14 @@ const router = createBrowserRouter([
     {
       path: 'categories/create',
       element: <CategoryCreate/>
+    },
+    {
+      path: 'user-management',
+      element: <UserManagement />
+    },
+    {
+      path:'user-management/create',
+      element: <UserManagementCreate />
     }
    ]
   },
