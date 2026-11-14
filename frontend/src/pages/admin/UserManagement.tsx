@@ -30,11 +30,6 @@ const UserManagement = () => {
 
     }
 
-    useEffect(() => {
-        console.log(context.isDataDelete);
-    }, [context.isDataDelete]);
-
-    
     const iconWidth = "1.4em";
     const columns:TableColumn<UserInterface>[] = [
         {

@@ -11,6 +11,19 @@ export const SidebarComponnent = ({isSidebarOpen, setIsSidebarOpen}: sidebarAdmi
     const classMenuActive = 'w-full hover:bg-white/30 px-3 py-2 flex gap-2 rounded-md bg-white/30';
     const classMenuInActive = 'w-full hover:bg-white/30 px-3 py-2 flex gap-2 rounded-md';
 
+
+    useEffect(() => {
+        const handleClickOutside = () => {
+            setIsSidebarOpen(false);
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        }
+    });
+
     return (
         <div className="flex flex-col px-6 py-5 w-70 min-h-screen justify-start items-center gap-4 relative">
             {/* close button */}
@@ -83,11 +96,7 @@ export const SidebarComponnent = ({isSidebarOpen, setIsSidebarOpen}: sidebarAdmi
     )
 }
 
-
-
-
-
-const SidebarAdmin = ({isSidebarOpen, setIsSidebarOpen}: sidebarAdminProps) => {    
+const SidebarAdmin = ({isSidebarOpen, setIsSidebarOpen}: sidebarAdminProps) => {
    return (
     <>
         <div className="hidden lg:flex">
@@ -122,7 +131,7 @@ const NavbarAdmin  = ({isSidebarOpen, setIsSidebarOpen}: sidebarAdminProps) => {
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         }
-    })
+    });
 
     return (
         <>
@@ -170,7 +179,7 @@ const ProfileDropdown = () => {
 
                             <span>John Doe</span>
                     </NavLink>
-                    <NavLink className="w-full  px-3 py-2 flex gap-2 rounded-md hover:bg-primary/30 h-full" to={""}>
+                    <NavLink className="w-full  px-3 peer-last:y-2 flex gap-2 rounded-md hover:bg-primary/30 h-full" to={"../auth"}>
                         <svg xmlns="http://www.w3.org/2000/svg" width={`${iconWidth}`} height={`${iconWidth}`} viewBox="0 0 24 24">
                             <path d="M0 0h24v24H0z" fill="none" />
                             <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.393 4C4 4.617 4 5.413 4 7.004v9.994c0 1.591 0 2.387.393 3.002q.105.165.235.312c.483.546 1.249.765 2.78 1.202c1.533.438 2.3.657 2.856.329a1.5 1.5 0 0 0 .267-.202C11 21.196 11 20.4 11 18.803V5.197c0-1.596 0-2.393-.469-2.837a1.5 1.5 0 0 0-.267-.202c-.555-.328-1.323-.11-2.857.329c-1.53.437-2.296.656-2.78 1.202a2.5 2.5 0 0 0-.234.312M11 4h2.017c1.902 0 2.853 0 3.443.586c.33.326.476.764.54 1.414m-6 14h2.017c1.902 0 2.853 0 3.443-.586c.33-.326.476-.764.54-1.414m4-6h-7m5.5-2.5S22 11.34 22 12s-2.5 2.5-2.5 2.5" />
