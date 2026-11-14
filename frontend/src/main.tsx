@@ -10,6 +10,8 @@ import Authors from './pages/admin/Authors'
 import AuthorCreate from './pages/admin/AuthorCreate'
 import Books from './pages/admin/Books'
 import BookCreate from './pages/admin/BookCreate'
+import Category from './pages/admin/Category'
+import CategoryCreate from './pages/admin/CategoryCreate'
 
 const router = createBrowserRouter([
   {
@@ -39,6 +41,14 @@ const router = createBrowserRouter([
     {
       path: 'books/create',
       element: <BookCreate/>
+    },
+    {
+      path: 'categories',
+      element: <Category/>
+    },
+    {
+      path: 'categories/create',
+      element: <CategoryCreate/>
     }
    ]
   },

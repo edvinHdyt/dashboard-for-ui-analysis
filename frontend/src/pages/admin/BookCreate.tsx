@@ -3,19 +3,39 @@ import { MainCard } from "../../Components/MainCard";
 import { useLocation, useOutletContext } from "react-router";
 import type { MainLayoutContext } from "../../Layouts/MainLayout";
 import { ButtonAdd, ButtonSecondary } from "../../Components/Button";
+import  Select from "react-select";
+import type { MultiValue } from "react-select";
+import makeAnimated from "react-select/animated";
+import { useState } from "react";
+
+const animatedComponents = makeAnimated();
+
+interface categoryElement{
+    value: string,
+    label:string
+}
+
 
 const BookCreate = () => {
- const location = useLocation();
-    const context = useOutletContext<MainLayoutContext>();
-
+    const location = useLocation();
     const isCreate = location.pathname.includes('create');
     const isUpdated = location.pathname.includes('update');
+    const context = useOutletContext<MainLayoutContext>();
+    const categories: Array<categoryElement> = [
+        {value: "1", label: "Fiksi"},
+        {value: "2", label: "Lorem"},
+        {value: "3", label: "Dolor"},
+    ]
+    const [selectedCategories, setSelectedCategories] = useState<MultiValue<categoryElement>>([]);
+
+    const manageCategoriSelected = (selected: MultiValue<categoryElement>) => {
+        setSelectedCategories(selected);
+    }
 
     const validatedInput = () => {
        const isbnInpt = document.getElementById("isbnInpt") as HTMLInputElement | null;
         const titleInpt = document.getElementById("titleInpt") as HTMLInputElement | null;
         const authorInpt = document.getElementById("authorInpt") as HTMLInputElement | HTMLSelectElement | null;
-        const categoryInpt = document.getElementById("categoryInpt") as HTMLInputElement | HTMLSelectElement | null;
         const yearInpt = document.getElementById("yearInpt") as HTMLInputElement | null;
 
         const isbnErr = document.getElementById("isbnErr");
@@ -59,8 +79,7 @@ const BookCreate = () => {
             setError(authorErr);
         }
 
-        const categoryVal = categoryInpt?.value.trim() ?? "";
-        if (categoryVal === "default") {
+        if (selectedCategories.length === 0) {
             setError(categoryErr, "Kategori wajib dipilih.");
         } else {
             setError(categoryErr);
@@ -104,9 +123,16 @@ const BookCreate = () => {
                     </div>
                     <div className="flex flex-col gap-1">
                         <label htmlFor="categoryInpt">Category</label>
-                       <select name="category" id="categoryInpt" className="w-full border px-3 py-2 rounded-sm outline-teal-500 border-slate-600" defaultValue={"default"}>
+                       {/* <select name="category" id="categoryInpt" className="w-full border px-3 py-2 rounded-sm outline-teal-500 border-slate-600" defaultValue={"default"}>
                         <option value="default">Choose Category</option>
-                       </select>
+                       </select> */}
+                       <Select 
+                        closeMenuOnSelect={false}
+                        components={animatedComponents}
+                        isMulti
+                        options={categories}
+                        onChange={manageCategoriSelected}
+                       />
                         <span className="text-sm text-red-500 hidden ms-1" id="categoryErr">Choose Category!</span>
                     </div>
                     <div className="flex flex-col gap-1">

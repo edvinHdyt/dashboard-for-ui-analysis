@@ -5,6 +5,7 @@ import { ButtonAdd, ButtonDeleteBulk } from "../../Components/Button";
 import { useOutletContext } from "react-router";
 import { useEffect } from "react";
 import type { MainLayoutContext } from "../../Layouts/MainLayout";
+import Select from "react-select/base";
 
 const bookStatus = {
     Tersedia: "Tersedia",
@@ -20,6 +21,7 @@ interface BooksInterface{
     author: string,
     status: BookStatus
 }
+
 
 const Books = () => {
     const context = useOutletContext<MainLayoutContext>();
@@ -54,7 +56,19 @@ const Books = () => {
         },
         {
             name: "Status",
-            selector: row => row.status
+            selector: row => row.status,
+            sortable: true,
+            cell: (row) => (
+                <span
+                className={`px-2.5 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${
+                    row.status === bookStatus.Tersedia
+                    ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                    : "bg-amber-100 text-amber-700 border border-amber-200"
+                }`}
+                >
+                {row.status}
+                </span>
+            )
         },
         {
             name: 'Action',

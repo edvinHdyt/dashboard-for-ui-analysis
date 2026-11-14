@@ -18,6 +18,8 @@ const AuthorCreate = ():ReactNode => {
 
         if (nameInput.value == ""){
             nameErr?.classList.remove('hidden');
+        }else{
+            nameErr?.classList.add("hidden")
         }
 
         context?.openAlertModal("test", 0);
