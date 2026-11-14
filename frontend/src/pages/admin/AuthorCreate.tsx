@@ -3,11 +3,11 @@ import TitlePage from "../../Components/TitlePage";
 import { MainCard } from "../../Components/MainCard";
 import { ButtonAdd, ButtonSecondary } from "../../Components/Button";
 import { useLocation, useOutletContext } from "react-router";
-
+import type { MainLayoutContext } from "../../Layouts/MainLayout";
 
 const AuthorCreate = ():ReactNode => {
     const location = useLocation();
-    const context = useOutletContext();
+    const context = useOutletContext<MainLayoutContext>();
 
     const isCreate = location.pathname.includes('create');
     const isUpdated = location.pathname.includes('update');

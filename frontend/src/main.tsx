@@ -8,6 +8,8 @@ import MainLayout from "./Layouts/MainLayout"
 import Dashboard from "./pages/admin/Dashboard"
 import Authors from './pages/admin/Authors'
 import AuthorCreate from './pages/admin/AuthorCreate'
+import Books from './pages/admin/Books'
+import BookCreate from './pages/admin/BookCreate'
 
 const router = createBrowserRouter([
   {
@@ -29,6 +31,14 @@ const router = createBrowserRouter([
     {
       path:'authors/create',
       element: <AuthorCreate/>,
+    },
+    {
+      path: 'books',
+      element: <Books/>
+    },
+    {
+      path: 'books/create',
+      element: <BookCreate/>
     }
    ]
   },
