@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthenticationController;
+use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\RefreshSanctumToken;
 use Illuminate\Http\Request;
@@ -19,5 +20,13 @@ Route::post("/register", [AuthenticationController::class, 'store'])->name('logi
 
 Route::middleware(['auth:sanctum', RefreshSanctumToken::class])->group(function (){
     Route::get("/me", [AuthenticationController::class, 'checkToken']);
+    Route::get("/author/get", [AuthorController::class, 'index']);
+    Route::get("/author/get/{id}", [AuthorController::class, 'getOne']);
     Route::post('/logout', [AuthenticationController::class, 'destroy']);
+    Route::post("/author/create", [AuthorController::class, 'store']);
+    Route::patch("/author/update/{id}", [AuthorController::class, 'update']);
+    Route::delete("/author/delete/{id}", [AuthorController::class, 'destroy']);
 });
+
+
+Route::get("/ping", fn() => 'ok');

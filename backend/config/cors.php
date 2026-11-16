@@ -29,7 +29,7 @@ return [
 
     'exposed_headers' => [],
 
-    'max_age' => 0,
+    'max_age' => 3600,
 
     // Ubah ke true jika menggunakan autentikasi berbasis cookie/session SPA
     'supports_credentials' => true,

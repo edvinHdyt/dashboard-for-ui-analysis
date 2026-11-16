@@ -16,6 +16,10 @@ class BookModel extends Model
     public const STATUS_TERSEDIA = 'Tersedia';
     public const STATUS_DIPINJAM = 'Dipinjam';
 
+    protected $table = "books";
+    protected $primaryKey = 'id';
+    public $incrementing = false;
+
     protected $fillable = [
         'isbn',
         'title',

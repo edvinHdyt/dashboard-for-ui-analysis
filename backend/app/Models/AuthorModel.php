@@ -11,10 +11,14 @@ class AuthorModel extends Model
 {
     use HasFactory, HasUuids;
 
+    protected $table="authors";
+    public $incrementing = false;
+    protected $primaryKey = 'id';
     protected $fillable = ['name'];
+
 
     public function books(): HasMany
     {
-        return $this->hasMany(Book::class, 'author_id');
+        return $this->hasMany(BookModel::class, 'author_id');
     }
 }
