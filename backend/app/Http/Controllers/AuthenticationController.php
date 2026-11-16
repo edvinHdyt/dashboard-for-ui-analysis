@@ -41,9 +41,20 @@ class AuthenticationController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function checkToken(Request $request)
     {
-        //
+        $user = $request->user()->load('roles');
+
+        return response()->json([
+            'status' => 1,
+            'message' => 'Token valid.',
+            'data' => [
+                'id' => $user->id,
+                'username' => $user->username,
+                'email' => $user->email,
+                'role' => $user->roles->first()?->role,
+            ],
+        ], 200);
     }
 
     /**
@@ -57,8 +68,12 @@ class AuthenticationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request)
     {
-        //
+        $this->authService->logout($request);
+
+        return[
+            'message' => "Berhasil logout!"
+        ];
     }
 }

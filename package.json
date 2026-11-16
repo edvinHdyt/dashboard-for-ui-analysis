@@ -1,0 +1,24 @@
+{
+  "name": "dsahboard-spk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"cyan,green\" \"cd backend && php artisan serve\" \"cd frontend && npm run dev\"",
+    "backend": "cd backend && php artisan serve",
+    "frontend": "cd frontend && npm run dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/edvinHdyt/dashboard-for-ui-analysis.git"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/edvinHdyt/dashboard-for-ui-analysis/issues"
+  },
+  "homepage": "https://github.com/edvinHdyt/dashboard-for-ui-analysis#readme",
+  "devDependencies": {
+    "concurrently": "^10.0.7"
+  }
+}

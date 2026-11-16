@@ -1,14 +1,26 @@
 import {LoginCard} from "../../Components/MainCard";
 import { ButtonAdd, ButtonHideShow, ButtonSecondary } from "../../Components/Button";
-import { useState } from "react";
-import { useLocation } from "react-router";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router";
+import createFormValidator from "../../Utils/FormValidator";
+import axios from "axios";
+import type { LaravelErrorResponse } from "../../Utils/InterfaceLaravelErrorAuth";
+import { setCryptoStorage } from "../../Utils/StorageHandle";
+import { Status } from "../../Components/Status";
 
 const Login = () => {
     const location = useLocation();
     const regsiterLink = location.pathname.includes("login") ? "../register" : "register";
     const [isHideHidden, setIsHideHidden] = useState(false);
     const [isShowHidden, setIsShowHidden] = useState(true);
+    const {setError, isValid} = createFormValidator();
+    const [isNewStatus, setIsNewStatus] = useState("");
+    const [statusType, setStatusType] = useState(0);
+    const [isLogin, setIsLogin] = useState(false);
 
+    const APIURI = import.meta.env.VITE_BACKEND_URI;
+
+    const navigate = useNavigate();
     const showHidePassword = (): void => {
         if (isHideHidden == false){
             setIsHideHidden(true);
@@ -19,28 +31,32 @@ const Login = () => {
         }
     }
 
+    useEffect(() => {
+       const setStatus = () => {
+            const logoutStatus = localStorage.getItem("status");
+            
+            setIsNewStatus(logoutStatus || "");
+            setStatusType(1);
+       }
+
+       setStatus();
+
+       if(isNewStatus != ""){
+            localStorage.removeItem('status');
+       }
+
+       return(() => {
+       })
+    }, [isNewStatus])
+
 
     const validateLogin = () => {
+        setIsLogin(true);
         const emailInpt = document.getElementById("email") as HTMLInputElement | null;
         const password = document.getElementById("password") as HTMLInputElement | null;
 
         const emailErr = document.getElementById("emailErr");
         const passErr = document.getElementById("passErr");
-
-        let isValid = true;
-
-        // Helper untuk menampilkan atau menyembunyikan pesan error
-        const setError = (el: HTMLElement | null, message?: string) => {
-            if (!el) return;
-            if (message) {
-                el.textContent = message;
-                el.classList.remove("hidden");
-                isValid = false;
-            } else {
-                el.classList.add("hidden");
-            }
-        };
-
         
         const emailVal = emailInpt?.value.trim() ?? "";
         if (emailVal === "") {
@@ -55,6 +71,57 @@ const Login = () => {
         } else {
             setError(passErr);
         }
+
+        if(isValid()){
+            loginProccedd(emailVal, passVal);
+        }else{
+            setIsLogin(false);
+        }
+    }
+
+    const loginProccedd = (email:string,  password:string) => {
+        const data = {
+            email,
+            password
+        };
+
+        axios.post(`${APIURI}/login`, data)
+        .then((res) => {
+            const data = res.data.data;
+
+            setCryptoStorage("auth", {
+                "accessToken": data.access_token,
+                "tokenType": data.token_type,
+                "user": data.user,
+            });
+
+            setIsLogin(false);
+
+            navigate('/admin');
+        })
+        .catch((err) => {
+            if (axios.isAxiosError<LaravelErrorResponse>(err)) {
+                const status = err.response?.status;
+                const responseData = err.response?.data;
+
+                // Jika error validasi dari Laravel (422)
+                if (status === 422 && responseData?.errors) {
+                const errors = responseData.errors;
+                if (errors.email?.[0]) {
+                    setError(document.getElementById("emailErr"), errors.email[0]);
+                }
+                if (errors.password?.[0]) {
+                    setError(document.getElementById("passErr"), errors.password[0]);
+                }
+                } else {
+                    const fallbackMsg = responseData?.message || "Terjadi kesalahan pada server.";
+                    setIsNewStatus(fallbackMsg);
+                    setStatusType(0);
+                }
+            }
+
+            setIsLogin(false);
+        });
     }
 
     return (
@@ -65,6 +132,7 @@ const Login = () => {
                         <div className="flex flex-col justify-center items-center">
                             <h1 className="text-xl text-bold font-sora">Sign In</h1>
                             <p>Selamat datang kembali!</p>
+                            {isNewStatus !="" ?  <Status  msg={isNewStatus} type={statusType} /> : ""}
                         </div>
 
                         <div className="flex flex-col w-[80%] gap-3">
@@ -104,7 +172,7 @@ const Login = () => {
                         </div>
                         <div className="flex w-[80%] justify-end gap-2">
                             <ButtonSecondary link={regsiterLink} label="Register"/>
-                            <ButtonAdd label="Sign In" onAction={validateLogin}/>
+                            <ButtonAdd label="Sign In" onAction={validateLogin} status={isLogin}/>
                         </div>
                     </div>
                 </LoginCard>

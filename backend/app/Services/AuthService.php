@@ -46,8 +46,9 @@ class AuthService
 
         $user = UserModel::where('email', $request->email)->get()->first();
 
-        if(Hash::check($request->password, $user->password)){
+        if($user != null && Hash::check($request->password, $user->password)){
             $role = $user->roles->pluck('role')->first();
+            $token = $user->createToken('auth_token')->plainTextToken;
 
             $userData = [
                 'id' => $user->id,
@@ -56,9 +57,21 @@ class AuthService
                 'role' => $role
             ];
 
-            return $userData;
+            return [
+                'user' => $userData,
+                'access_token' => $token,
+                'token_type' => 'Bearer'
+            ];
         } else {
             throw new IllogicalValuesException('Credential tidak sesuai');
         }
+    }
+
+    public function logout(Request $request){
+        $request->user()->currentAccessToken()->delete();
+
+        return [
+            'message' => 'Berhasil logout!'
+        ];
     }
 }

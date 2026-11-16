@@ -1,13 +1,24 @@
 import {LoginCard} from "../../Components/MainCard";
 import { ButtonAdd, ButtonHideShow, ButtonSecondary } from "../../Components/Button";
 import { useState } from "react";
+import axios from "axios";
+import createFormValidator from "../../Utils/FormValidator";
+import { Status } from "../../Components/Status";
+import { setCryptoStorage } from "../../Utils/StorageHandle";
+import {useNavigate } from "react-router";
+import type { LaravelErrorResponse } from "../../Utils/InterfaceLaravelErrorAuth";
 
 const Register = () => {
     const [isHideHidden, setIsHideHidden] = useState(false);
     const [isShowHidden, setIsShowHidden] = useState(true);
+    const [isRegister, setIsRegister] = useState(false);
+    const {setError, isValid} = createFormValidator();
+    const [isAxiosError, setIsAxiosErr] = useState("");
 
     const [isConfHideHidden, setIsConfHideHidden] = useState(false);
     const [isConfShowHidden, setIsConfShowHidden] = useState(true);
+    const navigate = useNavigate();
+    const APIURI = import.meta.env.VITE_BACKEND_URI;
 
     const showHidePassword = (): void => {
         if (isHideHidden == false){
@@ -30,31 +41,19 @@ const Register = () => {
     }
 
     const validatedInput = () => {
-       const usernameInpt = document.getElementById("usernameInpt") as HTMLInputElement | null;
+        setIsRegister(true);
+        const usernameInpt = document.getElementById("usernameInpt") as HTMLInputElement | null;
         const emailInpt = document.getElementById("emailInpt") as HTMLInputElement | null;
-        const roleInpt = document.getElementById("roleInpt") as HTMLInputElement | HTMLSelectElement | null;
         const password = document.getElementById("password") as HTMLInputElement | null;
         const confPass = document.getElementById("confPass") as HTMLInputElement | null;
+        const noHp = document.getElementById("noHpInpt") as HTMLInputElement | null;
 
         const usernameErr = document.getElementById("usernameErr");
         const emailErr = document.getElementById("emailErr");
-        const roleErr = document.getElementById("roleErr");
         const passErr = document.getElementById("passErr");
         const confPassErr = document.getElementById("confPassErr");
 
-        let isValid = true;
-
-        // Helper untuk menampilkan atau menyembunyikan pesan error
-        const setError = (el: HTMLElement | null, message?: string) => {
-            if (!el) return;
-            if (message) {
-                el.textContent = message;
-                el.classList.remove("hidden");
-                isValid = false;
-            } else {
-                el.classList.add("hidden");
-            }
-        };
+        const noHpVal = noHp?.value;
 
         const usernameVal = usernameInpt?.value.trim() ?? "";
         if (usernameVal === "") {
@@ -68,13 +67,6 @@ const Register = () => {
             setError(emailErr, "Email wajib diisi.");
         } else {
             setError(emailErr);
-        }
-
-        const roleVal = roleInpt?.value.trim() ?? "";
-        if (roleVal === "default") {
-            setError(roleErr, "Role wajib dipilih.");
-        } else {
-            setError(roleErr);
         }
 
         const passVal = password?.value.trim() ?? "";
@@ -94,7 +86,66 @@ const Register = () => {
         if(passVal != confPassVal){
             setError(passErr, "Password dan Confirm Password tidak sesuai")
         }
+        
+        if (isValid()){
+            registerProcced(usernameVal, emailVal, noHpVal, passVal);
+        } else {
+            setIsRegister(false);
+        }
+    }
 
+    const registerProcced = (username:string, email:string, noHp: string = "", password:string) => {
+        const data = {
+            username,
+            email,
+            "no_hp": noHp,
+            password
+        };
+
+        axios.post(`${APIURI}/register`, data)
+        .then((res) => {
+            const data = res.data.data;
+
+            setCryptoStorage("auth", {
+                "accessToken": data.access_token,
+                "tokenType": data.token_type,
+                "user": data.user,
+            });
+
+            setIsRegister(false);
+
+            navigate('/admin');
+        })
+        .catch((err) => {
+            if (axios.isAxiosError<LaravelErrorResponse>(err)) {
+                const status = err.response?.status;
+                const responseData = err.response?.data;
+
+                // Jika error validasi dari Laravel (422)
+                if (status === 422 && responseData?.errors) {
+                const errors = responseData.errors;
+
+                // Tampilkan pesan error ke masing-masing <span> jika ada
+                if (errors.username?.[0]) {
+                    setError(document.getElementById("usernameErr"), errors.username[0]);
+                }
+                if (errors.email?.[0]) {
+                    setError(document.getElementById("emailErr"), errors.email[0]);
+                }
+                if (errors.no_hp?.[0]) {
+                    setError(document.getElementById("noHpErr"), errors.no_hp[0]);
+                }
+                if (errors.password?.[0]) {
+                    setError(document.getElementById("passErr"), errors.password[0]);
+                }
+                } else {
+                    const fallbackMsg = responseData?.message || "Terjadi kesalahan pada server.";
+                    setIsAxiosErr(fallbackMsg);
+                }
+            }
+
+            setIsRegister(false);
+        });
     }
 
     return (
@@ -105,6 +156,7 @@ const Register = () => {
                         <div className="flex flex-col justify-center items-center">
                             <h1 className="text-xl text-bold font-sora">Register</h1>
                             <p>Senang menanti anda untuk bergabung!</p>
+                            {isAxiosError !="" ?  <Status  msg={isAxiosError} type={0} /> : ""}
                         </div>
 
                         <div className="flex flex-col w-[80%] gap-3">
@@ -177,7 +229,7 @@ const Register = () => {
                         </div>
                         <div className="flex w-[80%] justify-end gap-2">
                             <ButtonSecondary link="../" label="Sign In"/>
-                            <ButtonAdd label="Regsiter" onAction={validatedInput}/>
+                            <ButtonAdd label="Regsiter" onAction={validatedInput} status={isRegister}/>
                         </div>
                     </div>
                 </LoginCard>

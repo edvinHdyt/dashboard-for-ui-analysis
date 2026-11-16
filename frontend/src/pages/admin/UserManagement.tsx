@@ -2,9 +2,10 @@ import TitlePage from "../../Components/TitlePage";
 import { MainCard } from "../../Components/MainCard";
 import DataTable, {type TableColumn} from "react-data-table-component";
 import { ButtonAdd, ButtonDeleteBulk } from "../../Components/Button";
-import { useOutletContext } from "react-router";
-import { useEffect } from "react";
+import { Navigate, useOutletContext } from "react-router";
 import type { MainLayoutContext } from "../../Layouts/MainLayout";
+import { isAdmin, isSuperAdmin } from "../../Utils/CheckRole";
+import { useEffect } from "react";
 
 const ROLE = {
     SuperAdmin: "SuperAdmin",
@@ -25,9 +26,13 @@ interface UserInterface{
 const UserManagement = () => {
     const context = useOutletContext<MainLayoutContext>();
 
+
+    if(!isSuperAdmin(context.authData)){
+        return <Navigate to={'/admin'} replace/>
+    }
+
     const deleteOneData = () => {
         context.openDeleteConfirmModal();
-
     }
 
     const iconWidth = "1.4em";

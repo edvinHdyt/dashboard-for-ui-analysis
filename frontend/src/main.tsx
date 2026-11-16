@@ -15,6 +15,7 @@ import CategoryCreate from './pages/admin/CategoryCreate'
 import UserManagement from './pages/admin/UserManagement'
 import UserManagementCreate from './pages/admin/UserManagementCreate'
 import Register from './pages/auth/Regsiter'
+import { HandleLogout } from './Utils/HandleLogout'
 
 const router = createBrowserRouter([
   {
@@ -81,6 +82,10 @@ const router = createBrowserRouter([
       }
     ]
   },
+  {
+    path:'auth/logout',
+    element: <HandleLogout />
+  }
  
 ]);
 

@@ -5,6 +5,7 @@ import { ButtonAdd, ButtonDeleteBulk } from "../../Components/Button";
 import { useOutletContext } from "react-router";
 import { useEffect } from "react";
 import type { MainLayoutContext } from "../../Layouts/MainLayout";
+import { isAdmin, isSuperAdmin } from "../../Utils/CheckRole";
 
 
 interface CategoryInterface {
@@ -113,12 +114,13 @@ const Category = () => {
                             <label htmlFor="Search">Search</label>
                             <input type="text" className="px-2 py-2 border-slate-700 border rounded-md outline-teal-600 active:border" placeholder="Search"/>
                         </div>
+                        {isAdmin(context.authData) || isSuperAdmin(context.authData) ? 
                         <ButtonDeleteBulk label="Delete Selected">
                             <svg xmlns="http://www.w3.org/2000/svg" width={iconWidth} height={iconWidth} viewBox="0 0 16 16">
                                 <path d="M0 0h16v16H0z" fill="none" />
                                 <path fill="currentColor" d="M12.099 14.11a1 1 0 0 1-.995.89H4.897a1 1 0 0 1-.995-.89L3 6h10zM10 1a1 1 0 0 1 1 1v1h2a1 1 0 0 1 1 1v1H2V4a1 1 0 0 1 1-1h2V2a1 1 0 0 1 1-1zm0 1H6v1h4z" />
                             </svg>
-                        </ButtonDeleteBulk>
+                        </ButtonDeleteBulk> : ""}
                         <ButtonAdd link={"create"} label={"Add Category"}/>
                     </div>
                     <DataTable columns={columns} data={data} pagination customStyles={customStyle} selectableRows onSelectedRowsChange={handleSelectedRowsChange}/>
