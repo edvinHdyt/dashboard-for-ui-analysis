@@ -13,6 +13,9 @@ class CategoryModel extends Model
 
     public $timestamps = false;
 
+    protected $table="categories";
+    protected $primaryKey = 'id';
+    public $incrementing = false;
     protected $fillable = ['category'];
 
     public function books(): BelongsToMany

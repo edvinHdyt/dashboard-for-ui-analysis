@@ -1,46 +1,129 @@
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import TitlePage from "../../Components/TitlePage";
 import { MainCard } from "../../Components/MainCard";
 import { ButtonAdd, ButtonSecondary } from "../../Components/Button";
-import { useLocation, useOutletContext } from "react-router";
+import { useLocation, useNavigate, useOutletContext, useParams } from "react-router";
 import type { MainLayoutContext } from "../../Layouts/MainLayout";
+import createFormValidator from "../../Utils/FormValidator";
+import type { CategoryInterface } from "./Category";
+import api from "../../Utils/Api";
 
 const CategoryCreate = ():ReactNode => {
     const location = useLocation();
     const context = useOutletContext<MainLayoutContext>();
+    const {setError, isValid} = createFormValidator();
+    const [isSubmit, setIsSubmit] = useState(false);
 
-    const isCreate = location.pathname.includes('create');
+    const [categoryData, setCategoryData]  = useState<CategoryInterface>();
+    const [categoryName, setCategoryName]  = useState("");
+    const navigate = useNavigate();
+
     const isUpdated = location.pathname.includes('update');
 
     const validatedInput = () => {
+        setIsSubmit(true);
         const categoryInpt = document.getElementById("categoryInpt") as HTMLInputElement;
         console.log(categoryInpt.value);
         const categoryErr = document.getElementById("categoryErr");
 
-        if (categoryInpt.value == ""){
-            categoryErr?.classList.remove('hidden');
+        const categoryVal = categoryInpt.value;
+        if (categoryVal == ""){
+            setError(categoryErr, "Category wajib diisi!");
         }else{
-            categoryErr?.classList.add("hidden");
+            setError(categoryErr);
         }
 
-        context?.openAlertModal("test", 0);
+        if (isValid()){
+            if (!isUpdated){
+                createProccedd(categoryVal);
+            } else {
+                updateProcced(categoryVal);
+            }
+        } else{
+            setIsSubmit(false);
+        }
     }
+
+      const createProccedd = (category: string) => {
+        const data = {
+            category,
+        }
+
+        api.post("/category/create", data)
+        .then((res) => {
+            const data = res.data;
+            context?.openAlertModal(data.message, 1);
+
+            navigate('/admin/categories');
+        })
+        .catch((err) => {
+            const error = err.message;
+
+            context.openAlertModal(error, 0);
+        }).finally(() => {
+            setIsSubmit(false);
+        });
+    }
+    const updateProcced = (category:string) => {
+        const data = {
+            category,
+        }
+
+        if(categoryData!= undefined){
+            api.patch(`/category/update/${categoryData.id}`, data)
+            .then((res) => {
+                const data = res.data;
+                context?.openAlertModal(data.message, 1);
+    
+                navigate('/admin/categories');
+            })
+            .catch((err) => {
+                console.log(err)
+                const error = err.message;
+    
+                context.openAlertModal(error, 0);
+            }).finally(() => {
+                setIsSubmit(false);
+            })
+        } else {
+            context.openAlertModal('Terjadi Kesalahan', 0);
+            setIsSubmit(false);
+        }
+    }
+
+    const {id} = useParams();
+
+    useEffect(() => {
+        if (isUpdated){
+            api.get(`/category/get/${id}`)
+            .then((res) => {
+                const data = res.data.data;
+                setCategoryData(data);
+                setCategoryName(data.category);
+            }).catch(() => {
+                context.openAlertModal('Terjadi Kesalahan', 0);
+                navigate('/admin/category');
+            })
+    
+        }
+    }, [])
+
 
 
     return (
         <>
-           <TitlePage>Create Category</TitlePage>
+           <TitlePage>{!isUpdated ? "Create ": "Update "} Category</TitlePage>
            
            <MainCard>
                 <div className="flex flex-col gap-2">
                     <div className="flex flex-col gap-1">
                         <label htmlFor="Name">Category</label>
-                        <input type="text" name="name" id="categoryInpt" className="w-full border px-3 py-2 rounded-sm outline-teal-500 border-slate-600" placeholder="Category" required/>
+                        <input type="text" name="name" id="categoryInpt" className="w-full border px-3 py-2 rounded-sm outline-teal-500 border-slate-600" placeholder="Category" required defaultValue={categoryName}/>
                         <span className="text-sm text-red-500 hidden ms-1" id="categoryErr">Category is required!</span>
                     </div>
                     <div className="flex justify-end gap-2">
-                        <ButtonSecondary label="Back" link="../authors"/>
-                        <ButtonAdd label="Created" onAction={validatedInput}/>
+                        <ButtonSecondary label="Back" link="../categories"/>
+                        <ButtonAdd label={isUpdated ? "Update" : "Created"} onAction={validatedInput} status={isSubmit}/>
                     </div>
                 </div>
            </MainCard>

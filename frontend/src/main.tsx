@@ -32,11 +32,15 @@ const router = createBrowserRouter([
     },
     {
       path: "authors",
-      element: <Authors />
+      element: <Authors/>,
     },
     {
       path:'authors/create',
       element: <AuthorCreate/>,
+    },
+    {
+      path:'authors/update/:id',
+      element: <AuthorCreate/>
     },
     {
       path: 'books',
@@ -47,11 +51,19 @@ const router = createBrowserRouter([
       element: <BookCreate/>
     },
     {
+      path: 'book/update/:id',
+      element: <BookCreate />
+    },
+    {
       path: 'categories',
       element: <Category/>
     },
     {
       path: 'categories/create',
+      element: <CategoryCreate/>
+    },
+    {
+      path:'category/update/:id',
       element: <CategoryCreate/>
     },
     {

@@ -1,6 +1,5 @@
 import axios from "axios";
 import { getCryptoStorage, removeCryptoStorage } from "../Utils/StorageHandle";
-import { Navigate } from "react-router";
 
 export interface AuthStorage {
   accessToken: string;
@@ -13,7 +12,7 @@ export interface AuthStorage {
 }
 
 const api = axios.create({
-  baseURL: `${import.meta.env.VITE_BACKEND_URI}/`,
+  baseURL: `${import.meta.env.VITE_BACKEND_URI}`,
   headers: {
     Accept: "application/json",
     "Content-Type": "application/json",
@@ -39,9 +38,9 @@ api.interceptors.response.use(
       removeCryptoStorage("auth");
       localStorage.removeItem("access_token");
 
-      if (window.location.pathname !== "/login") {
-         window.location.href = "/auth";  
-      }
+        if (!window.location.pathname.startsWith("/auth")) {
+          window.location.href = "/auth";
+        }
     }
 
     return Promise.reject(error);

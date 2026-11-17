@@ -1,4 +1,4 @@
-import {Navigate, Outlet} from "react-router";
+import {Navigate, Outlet, useNavigate} from "react-router";
 import { SidebarAdmin, NavbarAdmin } from "./Navigations/NavigationAdmin";
 import { useEffect, useState } from "react";
 import { ModalAlertMsg, ModalDelete } from "../Components/Modals";
@@ -11,7 +11,8 @@ export interface MainLayoutContext{
     closeAlertModal: ()=>void,
     isDataDelete:boolean,
     openDeleteConfirmModal: () => void,
-    authData: AuthStorage
+    authData: AuthStorage,
+    setIsDataDelete: React.Dispatch<boolean>
 }
 
 function MainLayout(){
@@ -23,19 +24,26 @@ function MainLayout(){
     const [isDataDelete, setIsDataDelete] = useState(false);
     const authData = getCryptoStorage<AuthStorage>("auth");
 
-    useEffect(() => {
-        if (!authData) return;
+    // const token = authData?.accessToken;
 
-        api.get('/me')
-        .then((res) => {
-            setCryptoStorage<AuthStorage>("auth", {
-                accessToken: authData.accessToken,
-                user: res.data.data
-            });
-        }).catch(() => {
-        })
+    // const navigate = useNavigate();
 
-    }, [authData]);
+    // useEffect(() => {
+    //     if (!token) return;
+
+    //     api.get('/me')
+    //     .then((res) => {
+    //     setCryptoStorage<AuthStorage>("auth", {
+    //         accessToken: token,
+    //         user: res.data.data,
+    //     });
+    //     })
+    //     .catch(() => {
+    //     // token tidak valid: bersihkan sesi dan arahkan ke login
+    //     localStorage.removeItem("auth");   // sesuaikan dengan cara kamu menghapus sesi
+    //     navigate("/auth/login", { replace: true });
+    //     });
+    // }, [token, navigate]);
 
     if(!authData){
         return <Navigate to="../auth/login" replace/>
@@ -68,7 +76,8 @@ function MainLayout(){
         closeAlertModal,
         isDataDelete,
         openDeleteConfirmModal,
-        authData
+        authData,
+        setIsDataDelete
     }
 
     return (
