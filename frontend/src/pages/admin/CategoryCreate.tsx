@@ -7,6 +7,14 @@ import type { MainLayoutContext } from "../../Layouts/MainLayout";
 import createFormValidator from "../../Utils/FormValidator";
 import type { CategoryInterface } from "./Category";
 import api from "../../Utils/Api";
+import axios from "axios";
+
+interface LaravelCategoryErrorResponse{
+    message: string;
+    errors?:{
+        category?: string
+    }
+}
 
 const CategoryCreate = ():ReactNode => {
     const location = useLocation();
@@ -44,7 +52,24 @@ const CategoryCreate = ():ReactNode => {
         }
     }
 
-      const createProccedd = (category: string) => {
+    const ErrorCategoryHandler = (err:Error) =>{
+        if (axios.isAxiosError<LaravelCategoryErrorResponse>(err)) {
+            const status = err.response?.status;
+            const responseData = err.response?.data;
+
+            // Jika error validasi dari Laravel (422)
+            if (status === 422 && responseData?.errors) {
+                const errors = responseData.errors;
+
+                // Tampilkan pesan error ke masing-masing <span> jika ada
+                if (errors.category?.[0]) {
+                    setError(document.getElementById("categoryErr"), errors.category[0]);
+                }
+            }
+        }
+    }
+
+    const createProccedd = (category: string) => {
         const data = {
             category,
         }
@@ -58,7 +83,7 @@ const CategoryCreate = ():ReactNode => {
         })
         .catch((err) => {
             const error = err.message;
-
+            ErrorCategoryHandler(err);
             context.openAlertModal(error, 0);
         }).finally(() => {
             setIsSubmit(false);
@@ -80,7 +105,7 @@ const CategoryCreate = ():ReactNode => {
             .catch((err) => {
                 console.log(err)
                 const error = err.message;
-    
+                ErrorCategoryHandler(err);
                 context.openAlertModal(error, 0);
             }).finally(() => {
                 setIsSubmit(false);

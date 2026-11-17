@@ -61,16 +61,6 @@ const BookCreate = () => {
 
 
     const manageCategoriSelected = (selected: MultiValue<SelectElement>) => {
-        // if (selectedCategories != undefined){
-        //     const data:MultiValue<SelectElement>[] = [];
-
-        //     selectedCategories.forEach((elm:SelectElement) => {
-        //         data.push(elm);
-        //     });
-
-        //     data.push(selected);
-        // }
-
         setSelectedCategories(selected);
     }
 

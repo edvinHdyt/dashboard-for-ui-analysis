@@ -7,7 +7,14 @@ import type { MainLayoutContext } from "../../Layouts/MainLayout";
 import createFormValidator from "../../Utils/FormValidator";
 import api from "../../Utils/Api";
 import type { AuthorsInterface } from "./Authors";
+import axios from "axios";
 
+interface LaravelAuthorErrorResponse{
+    message: string;
+    errors?:{
+        name?: string[];
+    }
+}
 
 const AuthorCreate = ():ReactNode => {
     const location = useLocation();
@@ -44,31 +51,23 @@ const AuthorCreate = ():ReactNode => {
         }
     }
 
-    const updateProcced = (name:string) => {
-        const data = {
-            name,
-        }
+    const ErrorAuthorHandle = (err:Error) =>{
+        if (axios.isAxiosError<LaravelAuthorErrorResponse>(err)) {
+            const status = err.response?.status;
+            const responseData = err.response?.data;
 
-        if(authorData!= undefined){
-            api.patch(`/author/update/${authorData.id}`, data)
-            .then((res) => {
-                const data = res.data;
-                context?.openAlertModal(data.message, 1);
-    
-                navigate('/admin/authors');
-            })
-            .catch((err) => {
-                const error = err.message;
-    
-                context.openAlertModal(error, 0);
-            }).finally(() => {
-                setIsSubmit(false);
-            })
-        } else {
-            context.openAlertModal('Terjadi Kesalahan', 0);
-            setIsSubmit(false);
+            // Jika error validasi dari Laravel (422)
+            if (status === 422 && responseData?.errors) {
+                const errors = responseData.errors;
+
+                // Tampilkan pesan error ke masing-masing <span> jika ada
+                if (errors.name?.[0]) {
+                    setError(document.getElementById("nameErr"), errors.name[0]);
+                }
+            }
         }
     }
+
 
     const createProccedd = (name: string) => {
         const data = {
@@ -84,11 +83,37 @@ const AuthorCreate = ():ReactNode => {
         })
         .catch((err) => {
             const error = err.message;
-
+            ErrorAuthorHandle(err);
             context.openAlertModal(error, 0);
         }).finally(() => {
             setIsSubmit(false);
         })
+    }
+
+    const updateProcced = (name:string) => {
+        const data = {
+            name,
+        }
+
+        if(authorData!= undefined){
+            api.patch(`/author/update/${authorData.id}`, data)
+            .then((res) => {
+                const data = res.data;
+                context?.openAlertModal(data.message, 1);
+    
+                navigate('/admin/authors');
+            })
+            .catch((err) => {
+                const error = err.message;
+                ErrorAuthorHandle(err);
+                context.openAlertModal(error, 0);
+            }).finally(() => {
+                setIsSubmit(false);
+            })
+        } else {
+            context.openAlertModal('Terjadi Kesalahan', 0);
+            setIsSubmit(false);
+        }
     }
 
     const {id} = useParams();
