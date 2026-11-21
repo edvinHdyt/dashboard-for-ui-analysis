@@ -16,10 +16,15 @@ class AuthService
             'username' => 'required|string|max:50',
             'email' => 'required|string|email|max:100|unique:users,email',
             'no_hp' => 'string',
-            'password' => 'required|string'
+            'password' => 'required|string|min:3'
         ]);
 
-        $role = RoleModel::where("role", 'Member')->get()->first();
+        if (!isset($request->id_role)){
+            $role = RoleModel::where("role", 'Member')->get()->first();
+            $role = $role->id;
+        } else {
+            $role = $request->id_role;
+        }
 
         $passHash = Hash::make($request->password);
 
@@ -31,11 +36,9 @@ class AuthService
         ]);
 
         UserRoleModel::create([
-            'id_role' => $role->id,
+            'id_role' => $role,
             'id_user' => $user->id
         ]);
-
-
     }
 
     public function login(Request $request){
