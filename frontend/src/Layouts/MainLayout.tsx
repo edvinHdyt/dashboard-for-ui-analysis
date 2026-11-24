@@ -34,7 +34,7 @@ function MainLayout(){
 
     useEffect(() => {
         checkApi();
-        
+
         const currentMatch = [...matches]
         .reverse()
         .find((match) => (match.handle as TitleHandle)?.title);
@@ -82,11 +82,11 @@ function MainLayout(){
 
     return (
         <>
-            <div className={` bg-primary flex flex-row gap-2 min-w-0  min-h-screen h-screen max-h-full`}>
+            <div className={` bg-primary flex flex-row gap-2 min-h-screen w-full`}>
                 <SidebarAdmin isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} authData={authData}/>
                 <div className="flex flex-col w-full gap-2 flex-1 h-full">
                 <NavbarAdmin isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} authData={authData}/>
-                    <div className="w-full bg-slate-50 px-15 shadow-xl lg:rounded-l-md py-5 flex-1">
+                    <div className="w-full bg-slate-50 px-15 shadow-xl lg:rounded-l-md py-5 flex-1 min-h-screen">
                         <div className="flex gap-3 flex-col">
                             <Outlet context={dataContext satisfies MainLayoutContext}/>
                         </div>
