@@ -6,7 +6,8 @@ import { useNavigate, useOutletContext } from "react-router";
 import React, { useEffect, useState } from "react";
 import type { MainLayoutContext } from "../../Layouts/MainLayout";
 import { isAdmin, isSuperAdmin } from "../../Utils/CheckRole";
-import api from "../../Utils/Api";
+import api, { checkApi } from "../../Utils/Api";
+import { behaviorStore } from "../../Utils/behaviorStore";
 
 export interface AuthorsInterface {
     id: string,
@@ -22,14 +23,12 @@ const Authors = () => {
 
     const navigate = useNavigate();
 
-
     const deleteOneData = (event:React.MouseEvent<HTMLButtonElement>) => {
         context.openDeleteConfirmModal();
         setDeletedId(event.currentTarget.dataset["id"]);
     }
 
     useEffect(() => {
-        
         const deleteOneDataProcced = () =>{
             context.setIsDataDelete(false);
     
@@ -43,9 +42,12 @@ const Authors = () => {
             api.delete(`/author/delete/${deletedId}`)
             .then((res) => {
                 const data = res.data;
-
+                behaviorStore.trackFeature();
+                behaviorStore.addAttempt();
                 context?.openAlertModal(data.message, 1);
             }).catch((err) => {
+                behaviorStore.addError();
+                behaviorStore.addAttempt();
                 context?.openAlertModal(err.message, 0);
             })
         }
@@ -62,9 +64,22 @@ const Authors = () => {
             const datas = res.data.data;
             setAuthorDatas(datas);
             setAuthorDatasCurr(datas);
+            getPagination();
         }).catch((err) => {
             context?.openAlertModal(err.message, 0);
         });
+
+        const getPagination = () => {
+            const elm = document.getElementsByClassName("rdt_paginationPageList") as unknown as HTMLDivElement[];
+            if (elm.length!= 0){
+
+                elm[0].childNodes.forEach(btn => {
+                    btn.addEventListener("click", () => {
+                        behaviorStore.trackFeature()
+                    });
+                });
+            }
+        }
 
     },[context]);
 
@@ -84,12 +99,13 @@ const Authors = () => {
             name: 'Name',
             selector: (row) => row.name,
             sortable:true,
-            grow: 2
+            grow: 2,
         },
         { 
             name: 'Total Books',
             selector: row => row.totalBooks,
             grow: 1,
+            sortable:true,
             wrap: true
         },
         {
@@ -99,7 +115,7 @@ const Authors = () => {
                     <button className="px-3 py-1 text-xs font-medium bg-teal-600 text-white rounded hover:bg-teal-700 transition-colors cursor-pointer" data-id={row.id} onClick={redirectToUpdate}>
                         <svg xmlns="http://www.w3.org/2000/svg" width={iconWidth} height={iconWidth} viewBox="0 0 24 24" data-id={row.id}>
                             <path d="M0 0h24v24H0z" fill="none" data-id={row.id}/>
-                            <path fill="currentColor" fill-rule="evenodd" d="M21.455 5.416a.75.75 0 0 1-.096.943l-9.193 9.192a.75.75 0 0 1-.34.195l-3.829 1a.75.75 0 0 1-.915-.915l1-3.828a.8.8 0 0 1 .161-.312L17.47 2.47a.75.75 0 0 1 1.06 0l2.829 2.828a1 1 0 0 1 .096.118m-1.687.412L18 4.061l-8.518 8.518l-.625 2.393l2.393-.625z" clip-rule="evenodd" />
+                            <path fill="currentColor" fillRule="evenodd" d="M21.455 5.416a.75.75 0 0 1-.096.943l-9.193 9.192a.75.75 0 0 1-.34.195l-3.829 1a.75.75 0 0 1-.915-.915l1-3.828a.8.8 0 0 1 .161-.312L17.47 2.47a.75.75 0 0 1 1.06 0l2.829 2.828a1 1 0 0 1 .096.118m-1.687.412L18 4.061l-8.518 8.518l-.625 2.393l2.393-.625z" clipRule="evenodd" />
                             <path fill="currentColor" d="M19.641 17.16a44.4 44.4 0 0 0 .261-7.04a.4.4 0 0 1 .117-.3l.984-.984a.198.198 0 0 1 .338.127a46 46 0 0 1-.21 8.372c-.236 2.022-1.86 3.607-3.873 3.832a47.8 47.8 0 0 1-10.516 0c-2.012-.225-3.637-1.81-3.873-3.832a46 46 0 0 1 0-10.67c.236-2.022 1.86-3.607 3.873-3.832a48 48 0 0 1 7.989-.213a.2.2 0 0 1 .128.34l-.993.992a.4.4 0 0 1-.297.117a46 46 0 0 0-6.66.255a2.89 2.89 0 0 0-2.55 2.516a44.4 44.4 0 0 0 0 10.32a2.89 2.89 0 0 0 2.55 2.516c3.355.375 6.827.375 10.183 0a2.89 2.89 0 0 0 2.55-2.516" data-id={row.id}/>
                         </svg>
 
@@ -153,27 +169,25 @@ const Authors = () => {
 
     const searchData = (event:React.KeyboardEvent<HTMLInputElement>) => {
         const elm = event.currentTarget as HTMLInputElement;
-        const elmVal = elm?.value;
+        const elmVal = elm?.value.toLowerCase();
 
         if (elmVal?.trim() != ""){
             const newAuthor = authorDatas.filter((data) => {
-                return data.name.includes(elmVal);
+                return data.name.toLowerCase().includes(elmVal);
             });
 
             setAuthorDatasCurr(newAuthor);
         } else {
+            behaviorStore.addError();
             setAuthorDatasCurr(authorDatas);
         }
     }
-
-    
 
     const handleSelectedRowsChange = (state: { selectedRows: AuthorsInterface[] }) => {
         // state.selectedRows berisi array objek data mentah yang tercentang
         console.log(state.selectedRows)
     };
 
-    
     return(
         <>
            <TitlePage>Authors</TitlePage>
@@ -184,7 +198,7 @@ const Authors = () => {
                     <div className="flex justify-end gap-2 flex-wrap-reverse">
                         <div className="flex gap-2 items-center">
                             <label htmlFor="Search">Search</label>
-                            <input type="text" className="px-2 py-2 border-slate-700 border rounded-md outline-teal-600 active:border" placeholder="Search" onKeyUp={searchData}/>
+                            <input type="text" className="px-2 py-2 border-slate-700 border rounded-md outline-teal-600 active:border" placeholder="Search" onKeyUp={searchData} onClick={(() => behaviorStore.trackFeature())}/>
                         </div>
                         {isAdmin(context.authData) || isSuperAdmin(context.authData) ? 
                         <ButtonDeleteBulk label="Delete Selected">
@@ -195,7 +209,14 @@ const Authors = () => {
                         </ButtonDeleteBulk> : ""}
                         <ButtonAdd link={"create"} label={"Add Author"}/>
                     </div>
-                    <DataTable columns={columns} data={authorDatasCurr || []} pagination customStyles={customStyle} selectableRows={isSuperAdmin(context.authData) ? true : false } onSelectedRowsChange={handleSelectedRowsChange}/>
+                    <DataTable 
+                    columns={columns} 
+                    data={authorDatasCurr || []} 
+                    pagination 
+                    customStyles={customStyle}
+                    onSort={() => behaviorStore.trackFeature()}
+                    selectableRows={isSuperAdmin(context.authData) ? true : false } 
+                    onSelectedRowsChange={handleSelectedRowsChange}/>
                 </div>
            </MainCard>
         </>

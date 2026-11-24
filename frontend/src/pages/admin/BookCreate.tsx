@@ -12,10 +12,11 @@ import type { CategoryInterface } from "./Category";
 import api from "../../Utils/Api";
 import createFormValidator from "../../Utils/FormValidator";
 import axios from "axios";
+import { behaviorStore } from "../../Utils/behaviorStore";
 
 const animatedComponents = makeAnimated();
 
-interface SelectElement{
+export interface SelectElement{
     value: string,
     label:string
 }
@@ -55,7 +56,7 @@ const BookCreate = () => {
     const context = useOutletContext<MainLayoutContext>();
     const [selectedCategories, setSelectedCategories] = useState<MultiValue<SelectElement>>([]);
     const [selectedAuthors, setSelectedAuthors] = useState<string>();
-    const {setError, isValid} = createFormValidator();
+    const {setError,resetErrors,  isValid} = createFormValidator();
     const [isSubmit, setIsSubmit] = useState(false);
     const navigate = useNavigate();
 
@@ -115,7 +116,6 @@ const BookCreate = () => {
             api.get(`/book/get/${id}`)
             .then((res) => {
                 const data = res.data.data;
-                console.log(data)
                 const category:SelectElement[] = []
                 data.categories.forEach((elm:CategoryInterface) => {
                     category.push({value:elm.id, label: elm.category});
@@ -124,7 +124,7 @@ const BookCreate = () => {
                 setSelectedCategories(category);
                 setBookData(data);
                 setSelectedAuthors(data.author.id);
-                // console.log(data);
+                
             }).catch(() => {
                 context.openAlertModal('Terjadi Kesalahan', 0);
                 navigate('/admin/books');
@@ -152,6 +152,7 @@ const BookCreate = () => {
         if (isbnVal === "") {
             setError(isbnErr, "ISBN wajib diisi.");
         } else {
+            resetErrors(['isbnErr']);
             setError(isbnErr);
         }
 
@@ -159,6 +160,7 @@ const BookCreate = () => {
         if (titleVal === "") {
             setError(titleErr, "Judul buku wajib diisi.");
         } else {
+            resetErrors(['titleErr']);
             setError(titleErr);
         }
 
@@ -166,18 +168,21 @@ const BookCreate = () => {
         if (publisherVal === "") {
             setError(publisherErr, "Publisher buku wajib diisi.");
         } else {
+            resetErrors(['publisherErr'])
             setError(publisherErr);
         }
 
         if (selectedAuthors === undefined) {
             setError(authorErr, "Author wajib dipilih.");
         } else {
+            resetErrors(['authorErr'])
             setError(authorErr);
         }
 
         if (selectedCategories.length === 0) {
             setError(categoryErr, "Kategori wajib dipilih.");
         } else {
+            resetErrors(['categoryErr'])
             setError(categoryErr);
         }
 
@@ -190,6 +195,7 @@ const BookCreate = () => {
         } else if (!/^\d{4}$/.test(yearVal) || yearNum < 1000 || yearNum > currentYear) {
             setError(yearErr, `Tahun terbit harus berupa 4 digit angka (1000–${currentYear}).`);
         } else {
+            resetErrors(['yearErr'])
             setError(yearErr);
         }
         
@@ -200,6 +206,8 @@ const BookCreate = () => {
                 updateProcced(isbnVal, titleVal, publisherVal, parseInt(yearVal), descInpt?.value);
             }
         } else{
+            behaviorStore.addAttempt();
+            behaviorStore.addError();
             setIsSubmit(false);
         }
 
@@ -260,12 +268,15 @@ const BookCreate = () => {
         .then((res) => {
             const data = res.data;
             context?.openAlertModal(data.message, 1);
-
+            behaviorStore.trackFeature();
+            behaviorStore.addAttempt();
             navigate('/admin/books');
         })
         .catch((err) => {
             const error = err.message;
             ErrorBookHandle(err);
+            behaviorStore.addError();
+            behaviorStore.addAttempt();
             context.openAlertModal(error, 0);
         }).finally(() => {
             setIsSubmit(false);
@@ -294,12 +305,15 @@ const BookCreate = () => {
             .then((res) => {
                 const data = res.data;
                 context?.openAlertModal(data.message, 1);
-    
+                behaviorStore.trackFeature();
+                behaviorStore.addAttempt();
                 navigate('/admin/books');
             })
             .catch((err) => {
                 const error = err.message;
                 ErrorBookHandle(err);
+                behaviorStore.addError();
+                behaviorStore.addAttempt();
                 context.openAlertModal(error, 0);
             }).finally(() => {
                 setIsSubmit(false);

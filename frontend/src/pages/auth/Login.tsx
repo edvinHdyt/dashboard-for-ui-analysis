@@ -7,6 +7,7 @@ import axios from "axios";
 import type { LaravelErrorResponse } from "../../Utils/InterfaceLaravelErrorAuth";
 import { setCryptoStorage } from "../../Utils/StorageHandle";
 import { Status } from "../../Components/Status";
+import { behaviorStore } from "../../Utils/behaviorStore";
 
 const Login = () => {
     const location = useLocation();
@@ -94,6 +95,9 @@ const Login = () => {
                 "tokenType": data.token_type,
                 "user": data.user,
             });
+
+            behaviorStore.startSession();
+            behaviorStore.clearTrackLatencyCount();
 
             setIsLogin(false);
 

@@ -1,10 +1,10 @@
-import {Navigate, Outlet, useNavigate} from "react-router";
+import {Navigate, Outlet, useLocation, useMatches} from "react-router";
 import { SidebarAdmin, NavbarAdmin } from "./Navigations/NavigationAdmin";
 import { useEffect, useState } from "react";
 import { ModalAlertMsg, ModalDelete } from "../Components/Modals";
-import { getCryptoStorage, setCryptoStorage } from "../Utils/StorageHandle";
-import type { AuthStorage } from "../Utils/Api";
-import api from "../Utils/Api";
+import { getCryptoStorage } from "../Utils/StorageHandle";
+import { checkApi, type AuthStorage } from "../Utils/Api";
+import { useBehaviorTracker } from "../Utils/useBehaviorTracker";
 
 export interface MainLayoutContext{
     openAlertModal: (msg:string, type:number)=>void,
@@ -13,6 +13,10 @@ export interface MainLayoutContext{
     openDeleteConfirmModal: () => void,
     authData: AuthStorage,
     setIsDataDelete: React.Dispatch<boolean>
+}
+
+export interface TitleHandle{
+    title?: string
 }
 
 function MainLayout(){
@@ -24,26 +28,20 @@ function MainLayout(){
     const [isDataDelete, setIsDataDelete] = useState(false);
     const authData = getCryptoStorage<AuthStorage>("auth");
 
-    // const token = authData?.accessToken;
+    useBehaviorTracker();
+    const location = useLocation();
+    const matches = useMatches();
 
-    // const navigate = useNavigate();
+    useEffect(() => {
+        checkApi();
+        
+        const currentMatch = [...matches]
+        .reverse()
+        .find((match) => (match.handle as TitleHandle)?.title);
 
-    // useEffect(() => {
-    //     if (!token) return;
-
-    //     api.get('/me')
-    //     .then((res) => {
-    //     setCryptoStorage<AuthStorage>("auth", {
-    //         accessToken: token,
-    //         user: res.data.data,
-    //     });
-    //     })
-    //     .catch(() => {
-    //     // token tidak valid: bersihkan sesi dan arahkan ke login
-    //     localStorage.removeItem("auth");   // sesuaikan dengan cara kamu menghapus sesi
-    //     navigate("/auth/login", { replace: true });
-    //     });
-    // }, [token, navigate]);
+        const pageTitle = (currentMatch?.handle as TitleHandle)?.title;
+        document.title = pageTitle ? `${pageTitle} | Swakarsa` : "Swakarsa";
+    }, [matches]);
 
     if(!authData){
         return <Navigate to="../auth/login" replace/>
@@ -80,14 +78,16 @@ function MainLayout(){
         setIsDataDelete
     }
 
+    const isBookCreate = location.pathname.includes('books/create');
+
     return (
         <>
-            <div className="h-screen bg-primary flex flex-row gap-2">
+            <div className={` bg-primary flex flex-row gap-2 min-w-0  min-h-screen h-screen max-h-full`}>
                 <SidebarAdmin isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} authData={authData}/>
                 <div className="flex flex-col w-full gap-2 flex-1 h-full">
-                    <NavbarAdmin isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} authData={authData}/>
-                    <div className="w-full bg-slate-50 px-15 shadow-xl lg:rounded-l-md py-5 flex-1 h-full">
-                         <div className="flex gap-3 flex-col">
+                <NavbarAdmin isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} authData={authData}/>
+                    <div className="w-full bg-slate-50 px-15 shadow-xl lg:rounded-l-md py-5 flex-1">
+                        <div className="flex gap-3 flex-col">
                             <Outlet context={dataContext satisfies MainLayoutContext}/>
                         </div>
                     </div>

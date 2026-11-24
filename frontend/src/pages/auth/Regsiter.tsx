@@ -7,6 +7,7 @@ import { Status } from "../../Components/Status";
 import { setCryptoStorage } from "../../Utils/StorageHandle";
 import {useNavigate } from "react-router";
 import type { LaravelErrorResponse } from "../../Utils/InterfaceLaravelErrorAuth";
+import { behaviorStore } from "../../Utils/behaviorStore";
 
 const Register = () => {
     const [isHideHidden, setIsHideHidden] = useState(false);
@@ -112,6 +113,8 @@ const Register = () => {
                 "user": data.user,
             });
 
+            behaviorStore.startSession();
+            behaviorStore.clearTrackLatencyCount();
             setIsRegister(false);
 
             navigate('/admin');

@@ -8,6 +8,7 @@ import createFormValidator from "../../Utils/FormValidator";
 import api from "../../Utils/Api";
 import type { AuthorsInterface } from "./Authors";
 import axios from "axios";
+import { behaviorStore } from "../../Utils/behaviorStore";
 
 interface LaravelAuthorErrorResponse{
     message: string;
@@ -19,11 +20,11 @@ interface LaravelAuthorErrorResponse{
 const AuthorCreate = ():ReactNode => {
     const location = useLocation();
     const context = useOutletContext<MainLayoutContext>();
-    const {setError, isValid} = createFormValidator();
+    const {setError,resetErrors,  isValid} = createFormValidator();
     const [isSubmit, setIsSubmit] = useState(false);
     const [authorData, setAuthorData]  = useState<AuthorsInterface>();
     const [authorName, setAuthorName]  = useState("");
-
+    
     const isUpdated = location.pathname.includes('update');
 
     const navigate = useNavigate();
@@ -37,6 +38,7 @@ const AuthorCreate = ():ReactNode => {
         if (nameVal == ""){
             setError(nameErr, "Name wajib diisi!");
         }else{
+            resetErrors(['nameErr']);
             setError(nameErr);
         }
 
@@ -47,6 +49,8 @@ const AuthorCreate = ():ReactNode => {
                 updateProcced(nameVal);
             }
         } else{
+            behaviorStore.addAttempt();
+            behaviorStore.addError();
             setIsSubmit(false);
         }
     }
@@ -80,10 +84,13 @@ const AuthorCreate = ():ReactNode => {
             context?.openAlertModal(data.message, 1);
 
             navigate('/admin/authors');
+            behaviorStore.trackFeature();
+        behaviorStore.addAttempt();
         })
         .catch((err) => {
             const error = err.message;
             ErrorAuthorHandle(err);
+            behaviorStore.addError();
             context.openAlertModal(error, 0);
         }).finally(() => {
             setIsSubmit(false);
@@ -102,15 +109,19 @@ const AuthorCreate = ():ReactNode => {
                 context?.openAlertModal(data.message, 1);
     
                 navigate('/admin/authors');
+                behaviorStore.trackFeature();
+                behaviorStore.addAttempt();
             })
             .catch((err) => {
                 const error = err.message;
                 ErrorAuthorHandle(err);
+                behaviorStore.addError();
                 context.openAlertModal(error, 0);
             }).finally(() => {
                 setIsSubmit(false);
             })
         } else {
+            behaviorStore.addError();
             context.openAlertModal('Terjadi Kesalahan', 0);
             setIsSubmit(false);
         }
@@ -126,12 +137,13 @@ const AuthorCreate = ():ReactNode => {
                 setAuthorData(data);
                 setAuthorName(data.name);
             }).catch(() => {
+                
                 context.openAlertModal('Terjadi Kesalahan', 0);
                 navigate('/admin/authors');
             })
     
         }
-    }, [])
+    }, []);
 
 
     return (

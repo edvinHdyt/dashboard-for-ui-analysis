@@ -28,51 +28,68 @@ const router = createBrowserRouter([
     },
     {
       path: "dashboard",
-      element: <Dashboard/>
+      element: <Dashboard/>,
+      handle:{title:"Dashboard"}
     },
     {
       path: "authors",
       element: <Authors/>,
+      handle:{title:"Authors"}
     },
     {
       path:'authors/create',
       element: <AuthorCreate/>,
+      handle:{title:"Authors - Create"}
     },
     {
       path:'authors/update/:id',
-      element: <AuthorCreate/>
+      element: <AuthorCreate/>,
+      handle:{title:"Authors - Update"}
     },
     {
       path: 'books',
-      element: <Books/>
+      element: <Books/>,
+      handle:{title:"Books"}
     },
     {
       path: 'books/create',
-      element: <BookCreate/>
+      element: <BookCreate/>,
+      handle:{title:"Books - Create"}
     },
     {
       path: 'book/update/:id',
-      element: <BookCreate />
+      element: <BookCreate />,
+      handle:{title:"Books - Update"}
     },
     {
       path: 'categories',
-      element: <Category/>
+      element: <Category/>,
+      handle:{title:"Categories"}
     },
     {
       path: 'categories/create',
-      element: <CategoryCreate/>
+      element: <CategoryCreate/>,
+      handle:{title:"Category - Create"}
     },
     {
       path:'category/update/:id',
-      element: <CategoryCreate/>
+      element: <CategoryCreate/>,
+      handle:{title:"Category - Update"}
     },
     {
       path: 'user-management',
-      element: <UserManagement />
+      element: <UserManagement />,
+      handle:{title:"User Management"}
     },
     {
       path:'user-management/create',
-      element: <UserManagementCreate />
+      element: <UserManagementCreate />,
+      handle:{title:"User Management - Create"}
+    },
+    {
+      path:'user-management/update/:id',
+      element: <UserManagementCreate />,
+      handle:{title:"User Management - Update"}
     }
    ]
   },
@@ -82,15 +99,18 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Login/>
+        element: <Login/>,
+        handle: {title: "Login"}
       }, 
       {
         path: 'login',
-        element: <Login/>
+        element: <Login/>,
+        handle: {title: "Login"}
       },
       {
         path:'register',
-        element: <Register/>
+        element: <Register/>,
+        handle: {title: "Register"}
       }
     ]
   },
