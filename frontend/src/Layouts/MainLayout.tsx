@@ -78,8 +78,6 @@ function MainLayout(){
         setIsDataDelete
     }
 
-    const isBookCreate = location.pathname.includes('books/create');
-
     return (
         <>
             <div className={` bg-primary flex flex-row gap-2 min-h-screen w-full`}>
