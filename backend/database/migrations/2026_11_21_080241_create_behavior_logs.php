@@ -12,8 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('behavior_logs', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
+            $table->string('id_user', 255);
+            $table->double('error_rate');
+            $table->bigInteger('feature_usage');
+            $table->bigInteger('idle_time');
+            $table->bigInteger('task_time');
+            $table->bigInteger('device_screen');
+            $table->double('latency_rate');
             $table->timestamps();
+            $table->foreign('id_user')->references('id')->on('users')->cascadeOnDelete();
         });
     }
 

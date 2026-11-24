@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -50,5 +51,9 @@ class UserModel extends Authenticatable
         return $this->belongsToMany(RoleModel::class, 'user_roles', 'id_user', 'id_role')
             ->using(UserRoleModel::class)
             ->withPivot('id');
+    }
+
+    public function behaviorLogs():BelongsTo{
+        return $this->belongsTo(BehaviorLogsModel::class, 'id_user');
     }
 }

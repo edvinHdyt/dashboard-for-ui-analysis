@@ -33,7 +33,7 @@ Route::middleware(['auth:sanctum', RefreshSanctumToken::class])->group(function 
     Route::get("/book/get/{id}", [BookController::class, 'getOne']);
     Route::get("/category/get", [CategoryController::class, 'index']);
     Route::get("/category/get/{id}", [CategoryController::class, 'getOne']);
-    Route::get("/me", [AuthenticationController::class, 'checkToken']);
+    Route::get("/ping", function (){return response()->json(["ok"]);});
     Route::get("/role/get", [RoleController::class, 'index']);
     Route::get("/user-management/get", [UserController::class, 'index']);
     Route::get("/user-management/get/{id}", [UserController::class, 'getOne']);

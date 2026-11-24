@@ -17,8 +17,10 @@ class CategoryModelFactory extends Factory
      */
     public function definition(): array
     {
+        $category = fake()->unique()->words(2, true);
+
         return [
-            'category' => fake()->word()
+            'category' => ucwords($category),
         ];
     }
 }
